@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study — Circular Economy Business Model Analyzer</title>
+<style>
+  :root {
+    --green: #2d7a4f;
+    --green-light: #4aab73;
+    --green-pale: #e8f5ee;
+    --teal: #1a6b6b;
+    --teal-light: #e4f4f4;
+    --amber: #d4851a;
+    --amber-light: #fef3e2;
+    --border: #dde3ea;
+    --text: #1e2a35;
+    --text-soft: #6b7a8d;
+    --gray-light: #f4f5f7;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f4f2; color: var(--text); line-height: 1.75; }
+
+  /* HEADER */
+  header { background: linear-gradient(135deg, var(--teal) 0%, var(--green) 100%); color: white; padding: 56px 40px 52px; }
+  .header-inner { max-width: 820px; margin: 0 auto; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.83rem; font-weight: 600; margin-bottom: 24px; transition: color 0.2s; }
+  .back-link:hover { color: white; }
+  .case-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; opacity: 0.75; margin-bottom: 10px; }
+  header h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
+  header .subtitle { margin-top: 12px; opacity: 0.85; font-size: 1rem; max-width: 600px; line-height: 1.6; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.2); }
+  .meta-item { }
+  .meta-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.65; font-weight: 700; margin-bottom: 3px; }
+  .meta-val { font-size: 0.9rem; font-weight: 600; }
+
+  /* LAYOUT */
+  .page-body { display: grid; grid-template-columns: 1fr 260px; gap: 28px; max-width: 1060px; margin: 0 auto; padding: 44px 24px 80px; align-items: start; }
+
+  /* SIDEBAR */
+  aside { position: sticky; top: 24px; }
+  .sidebar-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 16px; }
+  .sidebar-card h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-soft); font-weight: 700; margin-bottom: 12px; }
+  .sidebar-card a { display: block; color: var(--green); font-size: 0.87rem; font-weight: 600; text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .sidebar-card a:last-child { border: none; }
+  .sidebar-card a:hover { color: var(--green-light); }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { background: var(--green-pale); color: var(--green); border-radius: 6px; padding: 3px 10px; font-size: 0.76rem; font-weight: 600; }
+  .stat-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .stat-row:last-child { border: none; }
+  .stat-label { font-size: 0.8rem; color: var(--text-soft); }
+  .stat-val { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+
+  /* MAIN CONTENT */
+  article { min-width: 0; }
+  section { margin-bottom: 44px; }
+  .section-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+  h2 { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 14px; line-height: 1.3; }
+  p { font-size: 0.95rem; color: var(--text); margin-bottom: 14px; }
+  p:last-child { margin-bottom: 0; }
+  hr { border: none; border-top: 1.5px solid var(--border); margin: 40px 0; }
+
+  /* CALLOUTS */
+  .callout { border-radius: var(--radius); padding: 16px 20px; margin: 20px 0; border-left: 4px solid; font-size: 0.9rem; line-height: 1.6; }
+  .callout-teal { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+  .callout-green { background: var(--green-pale); border-color: var(--green); color: #1a4d31; }
+  .callout-amber { background: var(--amber-light); border-color: var(--amber); color: #7a4a0a; }
+  .callout strong { font-weight: 700; }
+
+  /* CHALLENGE / SOLUTION SPLIT */
+  .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
+  .split-card { border-radius: 10px; padding: 18px 20px; border: 1.5px solid; }
+  .split-card h4 { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .split-card p { font-size: 0.84rem; line-height: 1.55; margin: 0; }
+  .sc-problem { background: #fdecea; border-color: #e8b4b0; }
+  .sc-problem h4 { color: #c0392b; }
+  .sc-solution { background: var(--green-pale); border-color: #a8d8b8; }
+  .sc-solution h4 { color: var(--green); }
+
+  /* FEATURE LIST */
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0; }
+  .feature-item { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow); }
+  .feature-icon { font-size: 1.3rem; margin-bottom: 7px; }
+  .feature-item h4 { font-size: 0.87rem; font-weight: 700; margin-bottom: 4px; }
+  .feature-item p { font-size: 0.8rem; color: var(--text-soft); margin: 0; line-height: 1.5; }
+
+  /* DECISION TABLE */
+  .decision-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 18px 0; }
+  .decision-table th { background: var(--gray-light); padding: 10px 14px; text-align: left; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 2px solid var(--border); }
+  .decision-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+  .decision-table tr:last-child td { border: none; }
+  .decision-table td:first-child { font-weight: 600; white-space: nowrap; }
+
+  /* REFLECTION */
+  .reflection-list { list-style: none; margin: 16px 0; }
+  .reflection-list li { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; line-height: 1.55; }
+  .reflection-list li:last-child { border: none; }
+  .r-bullet { flex-shrink: 0; font-size: 1rem; margin-top: 1px; }
+
+  /* OUTCOME STATS */
+  .outcome-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 20px 0; }
+  .outcome-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 16px; text-align: center; box-shadow: var(--shadow); }
+  .outcome-num { font-size: 2rem; font-weight: 800; color: var(--green); line-height: 1; margin-bottom: 6px; }
+  .outcome-label { font-size: 0.78rem; color: var(--text-soft); font-weight: 600; line-height: 1.4; }
+
+  /* CTA */
+  .cta-box { background: linear-gradient(135deg, var(--teal) 0%, var(--green) 100%); border-radius: var(--radius); padding: 30px 32px; color: white; margin-top: 40px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .cta-box h2 { font-size: 1.15rem; font-weight: 800; margin-bottom: 4px; }
+  .cta-box p { opacity: 0.82; font-size: 0.87rem; margin: 0; }
+  .cta-btns { display: flex; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+  .cta-btn { display: inline-block; font-weight: 700; font-size: 0.85rem; padding: 10px 20px; border-radius: 8px; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+  .cta-primary { background: white; color: var(--green); }
+  .cta-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+  .cta-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.5); }
+  .cta-outline:hover { border-color: white; }
+
+  footer { text-align: center; padding: 28px; font-size: 0.8rem; color: var(--text-soft); border-top: 1px solid var(--border); background: white; }
+
+  @media (max-width: 760px) {
+    header { padding: 36px 20px 36px; }
+    header h1 { font-size: 1.65rem; }
+    .page-body { grid-template-columns: 1fr; padding: 28px 16px 60px; }
+    aside { position: static; }
+    .split-grid, .feature-grid, .outcome-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="back-link" href="index.html">← Back to Analyzer</a>
+    <div class="case-label">Portfolio Case Study</div>
+    <h1>Circular Economy Business Model Analyzer</h1>
+    <p class="subtitle">A self-assessment tool that helps organizations evaluate circularity, map material loops, and generate strategic recommendations — built on the Ellen MacArthur Foundation's ReSOLVE framework.</p>
+    <div class="meta-row">
+      <div class="meta-item"><div class="meta-label">Role</div><div class="meta-val">Solo Designer & Developer</div></div>
+      <div class="meta-item"><div class="meta-label">Type</div><div class="meta-val">Interactive Web Tool</div></div>
+      <div class="meta-item"><div class="meta-label">Stack</div><div class="meta-val">HTML · CSS · JavaScript · Chart.js · jsPDF</div></div>
+      <div class="meta-item"><div class="meta-label">Frameworks</div><div class="meta-val">ReSOLVE · Circular BMC · EU Green Deal</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="sidebar-card">
+      <h3>Jump To</h3>
+      <a href="#context">Context & Motivation</a>
+      <a href="#problem">The Problem</a>
+      <a href="#solution">The Solution</a>
+      <a href="#features">Key Features</a>
+      <a href="#decisions">Design Decisions</a>
+      <a href="#outcomes">Outcomes</a>
+      <a href="#reflections">Reflections</a>
+    </div>
+    <div class="sidebar-card">
+      <h3>Project Stats</h3>
+      <div class="stat-row"><span class="stat-label">Assessment Tabs</span><span class="stat-val">5</span></div>
+      <div class="stat-row"><span class="stat-label">Scored Dimensions</span><span class="stat-val">17</span></div>
+      <div class="stat-row"><span class="stat-label">ReSOLVE Dimensions</span><span class="stat-val">6</span></div>
+      <div class="stat-row"><span class="stat-label">Dynamic Recommendations</span><span class="stat-val">8</span></div>
+      <div class="stat-row"><span class="stat-label">Backend Required</span><span class="stat-val">None</span></div>
+      <div class="stat-row"><span class="stat-label">Export</span><span class="stat-val">PDF report</span></div>
+    </div>
+    <div class="sidebar-card">
+      <h3>Skills Demonstrated</h3>
+      <div class="tag-list">
+        <span class="tag">Circular Economy</span>
+        <span class="tag">UI/UX Design</span>
+        <span class="tag">JavaScript</span>
+        <span class="tag">Data Visualization</span>
+        <span class="tag">Sustainability Strategy</span>
+        <span class="tag">Framework Research</span>
+        <span class="tag">ReSOLVE</span>
+        <span class="tag">Systems Thinking</span>
+        <span class="tag">Chart.js</span>
+        <span class="tag">jsPDF</span>
+      </div>
+    </div>
+    <div class="sidebar-card">
+      <h3>Links</h3>
+      <a href="index.html">🔄 Launch the Analyzer</a>
+      <a href="methodology.html">📄 Methodology Explainer</a>
+      <a href="https://github.com/[your-username]/circular-economy-analyzer" target="_blank">💻 GitHub Repo</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <article>
+
+    <section id="context">
+      <div class="section-label">Background</div>
+      <h2>Context & Motivation</h2>
+      <p>The circular economy is no longer a niche sustainability concept — it is a regulatory and strategic priority for businesses operating in the European Union. The EU's Circular Economy Action Plan (2020), the Corporate Sustainability Reporting Directive (CSRD), and the Right to Repair Directive (2024) are collectively creating real pressure on companies to understand and demonstrate circular business model practices.</p>
+      <p>Despite this, most available circular economy assessment tools are either inaccessible (locked behind enterprise software or consultancy engagements) or too surface-level to drive real strategic decision-making. I built this tool to fill that gap: a rigorous, framework-grounded assessment that any business could complete independently and act on immediately.</p>
+      <div class="callout callout-teal">
+        <strong>Why it matters for Nordic markets:</strong> Denmark, Finland, and Sweden have some of the world's most advanced national circular economy strategies. Danish companies in particular are actively integrating circular principles into core business model design — making this kind of analytical literacy a genuine differentiator for sustainability professionals working in the region.
+      </div>
+    </section>
+
+    <hr>
+
+    <section id="problem">
+      <div class="section-label">The Problem</div>
+      <h2>What Gap Does This Fill?</h2>
+      <div class="split-grid">
+        <div class="split-card sc-problem">
+          <h4>❌ The Problem</h4>
+          <p>Existing CE assessment tools are either high-cost enterprise platforms, overly simplified checklists, or academic frameworks with no practical UX. Organizations lack a free, structured, actionable way to audit their circular business model and know where to focus.</p>
+        </div>
+        <div class="split-card sc-solution">
+          <h4>✅ The Opportunity</h4>
+          <p>A well-designed, self-serve assessment tool — grounded in globally recognized frameworks and producing a composite score, radar visualization, and prioritized recommendations — could make circular business model analysis accessible to any organization.</p>
+        </div>
+      </div>
+      <p>The tool needed to balance two competing demands: enough rigor to be credible with sustainability professionals and enough accessibility to be completable without specialist knowledge. It also needed to be fully client-side to ensure it could be deployed as a static GitHub Pages site with no backend infrastructure or maintenance overhead.</p>
+    </section>
+
+    <hr>
+
+    <section id="solution">
+      <div class="section-label">The Solution</div>
+      <h2>A Five-Stage Assessment Framework</h2>
+      <p>The tool guides users through five structured stages, each addressing a distinct dimension of circular business model analysis. The stages are designed to progressively build context, so that by the time a user reaches the results panel, the scoring and recommendations are grounded in a rich picture of their specific model.</p>
+      <p><strong>Stage 1 — Company Profile</strong> captures sector, size, geography, and circularity maturity, and asks users to select relevant ReSOLVE strategies upfront. This frames the entire assessment and allows recommendations to be sector-contextual rather than generic.</p>
+      <p><strong>Stage 2 — Circular Business Model Canvas</strong> adapts Osterwalder's original nine-block canvas for circular economy principles, with each block reinterpreted through a circular lens: take-back programs, circular revenue streams, reverse logistics partnerships, and outcome-based value propositions.</p>
+      <p><strong>Stage 3 — Material Loop Mapping</strong> addresses the physical reality of circular economy: where does material go at end-of-life? Users map their loops, assess material risks and dependencies, and score their loop maturity across five sub-dimensions.</p>
+      <p><strong>Stage 4 — ReSOLVE Scoring</strong> rates the business against all six Ellen MacArthur Foundation ReSOLVE dimensions — Regenerate, Share, Optimise, Loop, Virtualise, Exchange — with free-text evidence fields to encourage reflection rather than rote scoring.</p>
+      <p><strong>Stage 5 — Results & Report</strong> synthesizes everything into a composite circularity score (0–100), a radar chart, a dimension-by-dimension breakdown, dynamic strategic recommendations ranked by priority, a 90-day quick wins checklist, and a one-click PDF export.</p>
+    </section>
+
+    <hr>
+
+    <section id="features">
+      <div class="section-label">Key Features</div>
+      <h2>What the Tool Does</h2>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          <h4>Composite Circularity Score</h4>
+          <p>Weighted 40/30/30 across ReSOLVE, Canvas, and Material Loops — with a tiered classification from Linear Model to Leading Circular Model.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🕸️</div>
+          <h4>ReSOLVE Radar Chart</h4>
+          <p>Live Chart.js radar visualization showing performance across all six circular dimensions — a standard output in professional CE assessments.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">💡</div>
+          <h4>Dynamic Recommendations</h4>
+          <p>8 possible recommendations, each triggered by specific score thresholds. Prioritized as High, Medium, or Quick Win based on the user's actual inputs — not static advice.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">✅</div>
+          <h4>90-Day Quick Wins</h4>
+          <p>Score-driven checklist of immediate, low-barrier actions — generated from gap analysis across all 17 scored sub-dimensions.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📄</div>
+          <h4>PDF Report Export</h4>
+          <p>Client-side PDF generation via jsPDF, auto-populated with company profile, all dimension scores, and bar chart visualizations — no server required.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📖</div>
+          <h4>Methodology Explainer</h4>
+          <p>A companion page documenting all nine sections of the theoretical and scoring framework, with full academic citations — positioning the tool as research-grounded, not just a UI.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <section id="decisions">
+      <div class="section-label">Design Decisions</div>
+      <h2>Key Technical & Design Choices</h2>
+      <table class="decision-table">
+        <thead>
+          <tr><th>Decision</th><th>Choice</th><th>Rationale</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Architecture</td><td>Static HTML/CSS/JS</td><td>No backend means no hosting cost, no maintenance, and instant GitHub Pages deployment — critical for a portfolio project that needs to stay live and accessible.</td></tr>
+          <tr><td>Scoring model</td><td>Weighted composite (40/30/30)</td><td>ReSOLVE is weighted highest because it captures strategic intent — the most meaningful signal of genuine circular transformation — over operational metrics alone.</td></tr>
+          <tr><td>Recommendations</td><td>Score-threshold triggered</td><td>Static recommendations ignore user-specific gaps. Threshold logic ensures each user sees the advice most relevant to their weakest dimensions, making the tool genuinely useful rather than decorative.</td></tr>
+          <tr><td>Visualization</td><td>Radar chart (Chart.js)</td><td>Radar charts are the standard output format in professional CE assessments — including the Ellen MacArthur Foundation's Circulytics tool — so using one signals domain literacy.</td></tr>
+          <tr><td>PDF export</td><td>jsPDF (client-side)</td><td>Server-side PDF generation would require a backend. jsPDF runs entirely in the browser, maintaining the static architecture while still delivering a professional report artifact.</td></tr>
+          <tr><td>UX flow</td><td>Tabbed multi-stage</td><td>A single long form is cognitively overwhelming for a 17-dimension assessment. Tabbed stages create natural breakpoints, reduce dropout, and allow progressive disclosure of complexity.</td></tr>
+          <tr><td>Framework choice</td><td>ReSOLVE + adapted BMC</td><td>Both are internationally recognized and used by practitioners, not just academics. Grounding the tool in established frameworks gives it credibility with the sustainability professionals it targets.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr>
+
+    <section id="outcomes">
+      <div class="section-label">Outcomes</div>
+      <h2>What This Project Demonstrates</h2>
+      <div class="outcome-grid">
+        <div class="outcome-card">
+          <div class="outcome-num">17</div>
+          <div class="outcome-label">Scored sub-dimensions across 3 framework layers</div>
+        </div>
+        <div class="outcome-card">
+          <div class="outcome-num">0</div>
+          <div class="outcome-label">Backend dependencies — fully static & self-contained</div>
+        </div>
+        <div class="outcome-card">
+          <div class="outcome-num">3</div>
+          <div class="outcome-label">Deliverable pages: Analyzer, Methodology, Case Study</div>
+        </div>
+      </div>
+      <p>Beyond the technical build, this project demonstrates the ability to take internationally recognized sustainability frameworks, translate them into a functional product with a clear user journey, and package the work in a way that is legible to both technical and non-technical audiences.</p>
+      <div class="callout callout-green">
+        <strong>Relevance to target roles:</strong> Circular economy business model analysis is a core skill set for sustainability consultants, ESG analysts, and circular economy specialists — particularly in Nordic markets where CE strategy is embedded in national policy. This project demonstrates both the conceptual literacy and the technical execution to work meaningfully at that intersection.
+      </div>
+    </section>
+
+    <hr>
+
+    <section id="reflections">
+      <div class="section-label">Reflections</div>
+      <h2>What I'd Do Differently</h2>
+      <ul class="reflection-list">
+        <li>
+          <span class="r-bullet">🔢</span>
+          <span><strong>Sector-specific weighting.</strong> The current scoring model weights all sub-dimensions equally within each category. In practice, a fashion company's most critical circular gap is almost always material loops, while a software company's is virtualisation. A future version would apply sector-aware weighting to make recommendations more precise.</span>
+        </li>
+        <li>
+          <span class="r-bullet">📥</span>
+          <span><strong>Data-backed scoring prompts.</strong> Each slider currently relies entirely on self-assessment. Prompting users with quantitative anchors — "score 8 if &gt;50% recycled content, score 4 if 10–25%" — would reduce optimism bias and make scores more comparable across organizations.</span>
+        </li>
+        <li>
+          <span class="r-bullet">📈</span>
+          <span><strong>Longitudinal tracking.</strong> The tool produces a point-in-time snapshot. A persistent storage layer would allow organizations to retake the assessment over time and visualize their circular maturity trajectory — far more valuable for ongoing strategy work.</span>
+        </li>
+        <li>
+          <span class="r-bullet">🌐</span>
+          <span><strong>Multilingual support.</strong> Given the tool's explicit orientation toward Nordic and EU markets, Danish and Finnish translations would meaningfully expand its practical reach and demonstrate market-specific intent to prospective employers in those regions.</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta-box">
+      <div>
+        <h2>Explore the Project</h2>
+        <p>Try the analyzer, read the methodology, or view the source code on GitHub.</p>
+      </div>
+      <div class="cta-btns">
+        <a href="index.html" class="cta-btn cta-primary">Launch Analyzer →</a>
+        <a href="methodology.html" class="cta-btn cta-outline">Read Methodology</a>
+      </div>
+    </div>
+
+  </article>
+</div>
+
+<footer>
+  Circular Economy Business Model Analyzer · Case Study · Built by [Your Name] · <a href="https://github.com/[your-username]/circular-economy-analyzer" style="color:var(--green);">GitHub</a>
+</footer>
+
+</body>
+</html>

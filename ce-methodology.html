@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methodology — Circular Economy Business Model Analyzer</title>
+<style>
+  :root {
+    --green: #2d7a4f;
+    --green-light: #4aab73;
+    --green-pale: #e8f5ee;
+    --teal: #1a6b6b;
+    --teal-light: #e4f4f4;
+    --amber: #d4851a;
+    --amber-light: #fef3e2;
+    --border: #dde3ea;
+    --text: #1e2a35;
+    --text-soft: #6b7a8d;
+    --gray-light: #f4f5f7;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f4f2; color: var(--text); line-height: 1.7; }
+
+  /* HEADER */
+  header { background: linear-gradient(135deg, var(--teal) 0%, var(--green) 100%); color: white; padding: 56px 40px 48px; }
+  .header-inner { max-width: 820px; margin: 0 auto; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.83rem; font-weight: 600; margin-bottom: 24px; transition: color 0.2s; }
+  .back-link:hover { color: white; }
+  header h1 { font-size: 2.1rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
+  header .subtitle { margin-top: 10px; opacity: 0.85; font-size: 1rem; max-width: 580px; }
+  .header-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .badge { background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 4px 14px; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.3px; }
+
+  /* LAYOUT */
+  main { max-width: 820px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* TOC */
+  .toc { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; margin-bottom: 40px; box-shadow: var(--shadow); }
+  .toc h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-soft); font-weight: 700; margin-bottom: 14px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 7px; }
+  .toc a { color: var(--green); font-size: 0.9rem; font-weight: 600; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* SECTIONS */
+  section { margin-bottom: 52px; }
+  .section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+  h2.section-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 16px; line-height: 1.25; }
+  p { margin-bottom: 14px; font-size: 0.95rem; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1.5px solid var(--border); margin: 48px 0; }
+
+  /* CALLOUT */
+  .callout { border-radius: var(--radius); padding: 18px 22px; margin: 22px 0; border-left: 4px solid; font-size: 0.9rem; line-height: 1.6; }
+  .callout-teal { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+  .callout-green { background: var(--green-pale); border-color: var(--green); color: var(--green); }
+  .callout-amber { background: var(--amber-light); border-color: var(--amber); color: #7a4a0a; }
+  .callout strong { font-weight: 700; }
+
+  /* FRAMEWORK CARDS */
+  .resolve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 22px 0; }
+  .resolve-card { background: white; border: 1.5px solid var(--border); border-radius: 10px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .resolve-card .r-icon { font-size: 1.4rem; margin-bottom: 8px; }
+  .resolve-card h3 { font-size: 0.92rem; font-weight: 800; margin-bottom: 5px; }
+  .resolve-card p { font-size: 0.82rem; color: var(--text-soft); margin: 0; line-height: 1.5; }
+  .resolve-card .r-examples { margin-top: 8px; font-size: 0.78rem; color: var(--green); font-style: italic; }
+
+  /* SCORE TABLE */
+  .score-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.88rem; }
+  .score-table th { background: var(--gray-light); padding: 10px 14px; text-align: left; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 2px solid var(--border); }
+  .score-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .score-table tr:last-child td { border: none; }
+  .tier-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+
+  /* LOOP DIAGRAM */
+  .loop-diagram { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 24px 0; padding: 24px; background: white; border: 1px solid var(--border); border-radius: var(--radius); }
+  .loop-node { text-align: center; padding: 12px 16px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; border: 2px solid; min-width: 80px; }
+  .loop-arrow { font-size: 1.3rem; color: var(--green); }
+  .ln-teal { background: #e4f4f4; border-color: var(--teal); color: var(--teal); }
+  .ln-green { background: var(--green-pale); border-color: var(--green); color: var(--green); }
+  .ln-amber { background: var(--amber-light); border-color: var(--amber); color: var(--amber); }
+  .ln-purple { background: #f0e8f8; border-color: #7b5ea7; color: #7b5ea7; }
+
+  /* WEIGHT TABLE */
+  .weight-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .weight-row:last-child { border: none; }
+  .weight-name { flex: 1; font-size: 0.88rem; font-weight: 600; }
+  .weight-bar-wrap { flex: 2; height: 10px; background: var(--gray-light); border-radius: 5px; overflow: hidden; }
+  .weight-bar { height: 100%; border-radius: 5px; }
+  .weight-pct { flex: 0 0 38px; text-align: right; font-size: 0.85rem; font-weight: 700; color: var(--green); }
+
+  /* CITATION */
+  .citations { background: var(--gray-light); border-radius: var(--radius); padding: 22px 26px; margin-top: 32px; }
+  .citations h3 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-soft); margin-bottom: 12px; }
+  .citations li { font-size: 0.82rem; color: var(--text-soft); margin-bottom: 7px; list-style: disc; margin-left: 18px; line-height: 1.5; }
+
+  /* CTA */
+  .cta-box { background: linear-gradient(135deg, var(--teal) 0%, var(--green) 100%); border-radius: var(--radius); padding: 32px 36px; text-align: center; color: white; margin-top: 48px; }
+  .cta-box h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+  .cta-box p { opacity: 0.85; font-size: 0.93rem; margin-bottom: 20px; }
+  .cta-btn { display: inline-block; background: white; color: var(--green); font-weight: 800; font-size: 0.9rem; padding: 12px 28px; border-radius: 8px; text-decoration: none; transition: all 0.2s; }
+  .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+
+  /* FOOTER */
+  footer { text-align: center; padding: 28px; font-size: 0.8rem; color: var(--text-soft); border-top: 1px solid var(--border); background: white; }
+
+  @media (max-width: 640px) {
+    header { padding: 36px 20px 32px; }
+    header h1 { font-size: 1.6rem; }
+    main { padding: 32px 16px 60px; }
+    .resolve-grid { grid-template-columns: 1fr; }
+    .loop-diagram { gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="back-link" href="index.html">← Back to Analyzer</a>
+    <h1>Methodology & Framework</h1>
+    <p class="subtitle">The theoretical foundations, scoring model, and design decisions behind the Circular Economy Business Model Analyzer</p>
+    <div class="header-badges">
+      <span class="badge">ReSOLVE Framework</span>
+      <span class="badge">Ellen MacArthur Foundation</span>
+      <span class="badge">EU Green Deal</span>
+      <span class="badge">Cradle to Cradle Principles</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#overview">1. What This Tool Does</a></li>
+      <li><a href="#ce-theory">2. Circular Economy: Core Theory</a></li>
+      <li><a href="#resolve">3. The ReSOLVE Framework</a></li>
+      <li><a href="#canvas">4. The Circular Business Model Canvas</a></li>
+      <li><a href="#loops">5. Material Loop Assessment</a></li>
+      <li><a href="#scoring">6. Scoring Model & Weighting</a></li>
+      <li><a href="#tiers">7. Assessment Tiers & Benchmarks</a></li>
+      <li><a href="#limitations">8. Limitations & Caveats</a></li>
+      <li><a href="#sources">9. Sources & Further Reading</a></li>
+    </ol>
+  </div>
+
+  <!-- 1 -->
+  <section id="overview">
+    <div class="section-label">Section 1</div>
+    <h2 class="section-title">What This Tool Does</h2>
+    <p>The Circular Economy Business Model Analyzer is a self-assessment tool that helps organizations evaluate how circular their business model currently is, identify structural gaps, and prioritize strategic actions to transition away from the linear take-make-dispose economy.</p>
+    <p>It is designed for sustainability practitioners, product managers, strategists, and consultants who need a structured, evidence-based framework for circular business model analysis — without requiring specialist software or external consultants.</p>
+    <div class="callout callout-teal">
+      <strong>Who it's for:</strong> SMEs beginning their circularity journey, large enterprises auditing circular initiatives, sustainability consultants benchmarking clients, and students or researchers studying circular business model transformation.
+    </div>
+    <p>The tool synthesizes three internationally recognized assessment dimensions — the ReSOLVE framework, Circular Business Model Canvas analysis, and material loop maturity scoring — into a single composite circularity index with actionable, score-driven recommendations.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 2 -->
+  <section id="ce-theory">
+    <div class="section-label">Section 2</div>
+    <h2 class="section-title">Circular Economy: Core Theory</h2>
+    <p>The circular economy (CE) is a systemic approach to economic development designed to benefit business, society, and the environment. In contrast to the traditional linear economy — in which resources are extracted, manufactured into products, used, and discarded — a circular economy aims to keep products, materials, and resources in use for as long as possible.</p>
+    <p>The concept draws from multiple intellectual traditions, including industrial ecology, biomimicry, cradle-to-cradle design, the performance economy, and regenerative design. Its modern commercial framing was largely codified by the Ellen MacArthur Foundation, which has worked with hundreds of global corporations and governments to mainstream circular thinking since 2010.</p>
+
+    <div class="loop-diagram">
+      <div class="loop-node ln-teal">🌱<br>Source</div>
+      <div class="loop-arrow">→</div>
+      <div class="loop-node ln-green">🏭<br>Produce</div>
+      <div class="loop-arrow">→</div>
+      <div class="loop-node ln-amber">🛒<br>Use</div>
+      <div class="loop-arrow">→</div>
+      <div class="loop-node ln-purple">♻️<br>Recover</div>
+      <div class="loop-arrow" style="font-size:1.1rem; color:var(--green);">↺ back to Source</div>
+    </div>
+
+    <p>Two distinct material cycles underpin circular economy theory:</p>
+    <p><strong>Biological nutrients</strong> — organic materials designed to safely re-enter the biosphere through composting, anaerobic digestion, or biodegradation, regenerating natural systems in the process.</p>
+    <p><strong>Technical nutrients</strong> — synthetic and inorganic materials (metals, polymers, electronics) designed to circulate at high quality indefinitely through reuse, remanufacturing, and recycling, without entering the biosphere.</p>
+    <div class="callout callout-green">
+      <strong>The CE is not just recycling.</strong> Recycling is the last resort in a circular hierarchy. Higher-value loops — maintained use, reuse, repair, remanufacturing — preserve more embedded energy, labor, and material value, and are significantly more resource-efficient.
+    </div>
+    <p>The EU's Circular Economy Action Plan (2020), part of the European Green Deal, sets binding targets for circular economy transition across member states and extends reporting requirements to companies operating in the EU — making circular business model analysis an increasingly regulatory concern, not just a sustainability aspiration.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 3 -->
+  <section id="resolve">
+    <div class="section-label">Section 3</div>
+    <h2 class="section-title">The ReSOLVE Framework</h2>
+    <p>The ReSOLVE framework, developed by the Ellen MacArthur Foundation and McKinsey, defines six circular economy business actions. It is the most widely adopted practitioner framework for circular strategy, used by companies including Renault, Unilever, Apple, and Philips as a lens for identifying circular opportunities.</p>
+    <p>Each letter represents a distinct strategic lever, and businesses can pursue multiple simultaneously. Together, they form the basis of the ReSOLVE scoring dimension in this analyzer (weighted at 40% of the composite score).</p>
+
+    <div class="resolve-grid">
+      <div class="resolve-card">
+        <div class="r-icon">♻️</div>
+        <h3 style="color:var(--teal);">R — Regenerate</h3>
+        <p>Shift to renewable energy and materials. Return biological materials to the biosphere. Restore and protect natural systems through land management and resource use.</p>
+        <div class="r-examples">e.g. solar-powered operations, compostable packaging, regenerative agriculture inputs</div>
+      </div>
+      <div class="resolve-card">
+        <div class="r-icon">🤝</div>
+        <h3 style="color:var(--green);">e — Share</h3>
+        <p>Keep products in use longer through sharing platforms, product life extension, collaborative consumption, second-hand markets, and maintenance services.</p>
+        <div class="r-examples">e.g. Zipcar, Airbnb, Patagonia Worn Wear, library-of-things models</div>
+      </div>
+      <div class="resolve-card">
+        <div class="r-icon">⚙️</div>
+        <h3 style="color:#5c7ae8;">O — Optimise</h3>
+        <p>Increase performance and efficiency of products and operations. Remove waste from supply chains. Use technology — IoT, big data, automation — to reduce resource use.</p>
+        <div class="r-examples">e.g. predictive maintenance, smart packaging, AI-optimized logistics</div>
+      </div>
+      <div class="resolve-card">
+        <div class="r-icon">🔁</div>
+        <h3 style="color:var(--amber);">L — Loop</h3>
+        <p>Keep components and materials in closed loops. Prioritize inner loops (maintenance, reuse) over outer ones (recycling). Enable remanufacturing and high-quality material recovery.</p>
+        <div class="r-examples">e.g. Renault remanufacturing, Interface carpet tiles, Caterpillar reborn parts</div>
+      </div>
+      <div class="resolve-card">
+        <div class="r-icon">💻</div>
+        <h3 style="color:#a854a8;">V — Virtualise</h3>
+        <p>Dematerialise products and services. Deliver value through digital means that replace physical goods, reducing material throughput entirely.</p>
+        <div class="r-examples">e.g. Spotify replacing CDs, e-books, digital twin replacing physical prototypes</div>
+      </div>
+      <div class="resolve-card">
+        <div class="r-icon">🔄</div>
+        <h3 style="color:var(--green);">E — Exchange</h3>
+        <p>Replace old materials, components, and technologies with advanced alternatives. Adopt bio-based or fully recyclable inputs. Leverage new processes that enable circular flows.</p>
+        <div class="r-examples">e.g. biopolymers replacing single-use plastic, green steel, waterless dyeing</div>
+      </div>
+    </div>
+
+    <div class="callout callout-amber">
+      <strong>Important nuance:</strong> No business will score high across all six dimensions — nor should they. Virtualise is irrelevant for a remanufacturer; Regenerate is less applicable to a pure software firm. The framework is most useful for identifying which levers are most accessible and highest-impact for a given sector and business model.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 4 -->
+  <section id="canvas">
+    <div class="section-label">Section 4</div>
+    <h2 class="section-title">The Circular Business Model Canvas</h2>
+    <p>The tool adapts Osterwalder and Pigneur's Business Model Canvas — the standard framework for mapping business models across nine building blocks — for circular economy analysis. The adaptation draws from academic work by Lewandowski (2016) and the ReSOLVE Canvas developed by practitioners at the Copenhagen Business School and the Leiden–Delft–Erasmus Centre for Sustainability.</p>
+    <p>Each canvas block is re-interpreted through a circular lens:</p>
+    <p><strong>Value Proposition</strong> is assessed not just on customer value, but on whether value is delivered through use rather than ownership, and whether the proposition preserves rather than consumes resources. A score of 10 represents a fully servitized or outcome-based offer (e.g. "lighting as a service" rather than selling bulbs).</p>
+    <p><strong>Customer Relationships</strong> examines whether the model actively engages customers in circular behaviors — return schemes, repair culture, product stewardship — rather than treating the customer relationship as ending at point of sale.</p>
+    <p><strong>Key Resources</strong> scores the proportion of renewable, recycled, or recovered inputs and whether assets are owned linearly or managed as circular resources (leased, shared, or maintained).</p>
+    <p><strong>Key Activities</strong> assesses whether core operational activities include circular processes: take-back, sorting, remanufacturing, repair, or material recovery — rather than only forward supply chain activities.</p>
+    <p><strong>Key Partners</strong> maps the depth of the circular ecosystem — whether partners exist for reverse logistics, reprocessing, and material recovery — recognizing that circular economies require collaborative value chains that no single firm can own alone.</p>
+    <p><strong>Revenue & Cost Streams</strong> evaluates whether the business captures value from circularity (resale of recovered materials, service contracts, refurbished goods) and whether cost structures reflect circular investments (reverse logistics, R&D for disassembly) or remain purely extraction-focused.</p>
+    <p>The canvas dimension contributes 30% to the composite circularity score, weighted equally across its six sub-dimensions.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 5 -->
+  <section id="loops">
+    <div class="section-label">Section 5</div>
+    <h2 class="section-title">Material Loop Assessment</h2>
+    <p>The material loop dimension evaluates how effectively a business keeps physical materials in use at their highest possible value. This draws from the Ellen MacArthur Foundation's butterfly diagram, the Cradle to Cradle certified product standard, and the EU's Product Environmental Footprint methodology.</p>
+    <p>Five sub-dimensions are scored:</p>
+    <p><strong>Durability & Longevity</strong> — whether products are designed and built to last, with high scores representing products with significantly extended functional lifetimes relative to industry average.</p>
+    <p><strong>Repairability & Modularity</strong> — whether products can be repaired, upgraded, or disassembled by users or technicians. The EU's Right to Repair Directive (2024) makes this an increasingly regulatory dimension in European markets.</p>
+    <p><strong>Recyclable Output Content</strong> — what percentage of the product's materials can be recovered and recycled at end-of-life without significant quality degradation.</p>
+    <p><strong>Reverse Logistics Capability</strong> — whether infrastructure exists to physically return products or components to the organization or its partners, a prerequisite for any closed-loop operation.</p>
+    <p><strong>Secondary Material Value Captured</strong> — whether recovered materials have genuine secondary market value, distinguishing high-quality circular loops from downcycling or low-grade shredding.</p>
+    <div class="callout callout-green">
+      <strong>The inner loop principle:</strong> Circular economy theory holds that tighter loops preserve more value. Reuse preserves more value than remanufacturing, which preserves more than recycling. This tool weights assessments accordingly — a business with strong reuse and repair capabilities scores higher than one relying primarily on recycling infrastructure.
+    </div>
+    <p>The material loop dimension contributes 30% to the composite score.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 6 -->
+  <section id="scoring">
+    <div class="section-label">Section 6</div>
+    <h2 class="section-title">Scoring Model & Weighting</h2>
+    <p>The composite circularity score (0–100) is calculated from three assessment dimensions, each weighted to reflect their relative strategic importance in a circular business model:</p>
+
+    <div style="margin: 20px 0;">
+      <div class="weight-row">
+        <span class="weight-name">ReSOLVE Framework Score</span>
+        <div class="weight-bar-wrap"><div class="weight-bar" style="width:40%;background:var(--green);"></div></div>
+        <span class="weight-pct">40%</span>
+      </div>
+      <div class="weight-row">
+        <span class="weight-name">Circular Business Model Canvas</span>
+        <div class="weight-bar-wrap"><div class="weight-bar" style="width:30%;background:var(--teal);"></div></div>
+        <span class="weight-pct">30%</span>
+      </div>
+      <div class="weight-row">
+        <span class="weight-name">Material Loop Assessment</span>
+        <div class="weight-bar-wrap"><div class="weight-bar" style="width:30%;background:var(--amber);"></div></div>
+        <span class="weight-pct">30%</span>
+      </div>
+    </div>
+
+    <p>Within each dimension, sub-scores are rated on a 1–10 scale and averaged equally. The ReSOLVE average and Canvas average are each multiplied by 10 to normalize to a 100-point scale before weighting.</p>
+    <p><strong>Why ReSOLVE is weighted highest (40%):</strong> The ReSOLVE framework captures strategic intent and systemic circular design — the most meaningful indicator of whether a business is genuinely transforming its model, rather than making incremental operational improvements.</p>
+    <p><strong>Why Canvas and Loops share equal weight (30% each):</strong> Business model structure and physical material flows are equally foundational to circular viability. A circular value proposition without the operational loops to support it is aspirational but not functional — and vice versa.</p>
+    <div class="callout callout-amber">
+      <strong>Limitation note:</strong> All dimensions are currently self-assessed, meaning scores reflect perceived or intended performance rather than independently verified data. For formal reporting or verification purposes, scores should be validated against quantitative data and third-party audits. See Section 8 for full limitations.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 7 -->
+  <section id="tiers">
+    <div class="section-label">Section 7</div>
+    <h2 class="section-title">Assessment Tiers & Benchmarks</h2>
+    <p>Composite scores are mapped to four assessment tiers, developed from benchmarking literature and practitioner frameworks published by the Ellen MacArthur Foundation, Accenture, and the Circle Economy Foundation's Circulytics tool:</p>
+
+    <table class="score-table">
+      <thead>
+        <tr><th>Score</th><th>Tier</th><th>Interpretation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="tier-dot" style="background:#2d7a4f;"></span>80–100</td><td><strong>Leading Circular Model</strong></td><td>Demonstrates advanced, integrated circular economy strategy. Suitable for external verification, certification pursuit, and thought leadership. Examples: Interface, Philips, Renault.</td></tr>
+        <tr><td><span class="tier-dot" style="background:#1a6b6b;"></span>60–79</td><td><strong>Developing Circular Model</strong></td><td>Meaningful circular initiatives in place, but material gaps remain in system integration or specific dimensions. Targeted investment will unlock significant value and bring the model to leading status.</td></tr>
+        <tr><td><span class="tier-dot" style="background:#d4851a;"></span>40–59</td><td><strong>Emerging Circular Model</strong></td><td>Some circular elements present, but the model remains predominantly linear. Structural changes to core value delivery, material flows, or reverse logistics are needed.</td></tr>
+        <tr><td><span class="tier-dot" style="background:#c0392b;"></span>0–39</td><td><strong>Linear Model</strong></td><td>The business operates on a conventional linear model. Fundamental rethinking of product design, business model structure, and material strategy is required to begin a circular transition.</td></tr>
+      </tbody>
+    </table>
+
+    <p>These thresholds are indicative rather than absolute. Sector context matters significantly — a mining company scoring 45 may be more advanced relative to peers than a software firm scoring 55. The tool's recommendations are designed to be contextually relevant to the entered sector and maturity level.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 8 -->
+  <section id="limitations">
+    <div class="section-label">Section 8</div>
+    <h2 class="section-title">Limitations & Caveats</h2>
+    <p>This tool is designed to support structured thinking, not replace rigorous life cycle assessment (LCA), material flow analysis (MFA), or third-party sustainability auditing. Users should be aware of the following limitations:</p>
+    <p><strong>Self-assessment bias.</strong> All scores are provided by the user and reflect perceived performance. There is an inherent risk of optimism bias, particularly for organizations early in their circularity journey. Wherever possible, scores should be anchored to measurable data (% recycled content, return rates, energy mix).</p>
+    <p><strong>Equal sub-dimension weighting.</strong> Within each dimension, all sub-scores are currently weighted equally. In practice, some factors — such as material loop closure — may be more impactful than others depending on sector and product type. Future versions could incorporate sector-specific weighting models.</p>
+    <p><strong>No supply chain scope.</strong> The tool assesses the business model of the direct organization and does not extend to Scope 3 supply chain impacts or upstream material extraction. A business can score well here while relying on highly extractive supplier practices.</p>
+    <p><strong>Regulatory alignment is indicative.</strong> The tool references EU Green Deal and CSRD frameworks as relevant context but does not constitute legal or compliance advice. Organizations with CSRD reporting obligations should work with qualified advisors.</p>
+    <p><strong>Static snapshot.</strong> The assessment captures a point-in-time view. Circular business model transformation is a dynamic, multi-year process — scores should be revisited at regular intervals (annually or following major strategic changes).</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 9 -->
+  <section id="sources">
+    <div class="section-label">Section 9</div>
+    <h2 class="section-title">Sources & Further Reading</h2>
+    <div class="citations">
+      <h3>Frameworks & Primary Sources</h3>
+      <ul>
+        <li>Ellen MacArthur Foundation (2015). <em>Towards a Circular Economy: Business Rationale for an Accelerated Transition.</em></li>
+        <li>Ellen MacArthur Foundation & McKinsey (2014). <em>ReSOLVE Framework for Circular Economy Business Action.</em></li>
+        <li>Osterwalder, A. & Pigneur, Y. (2010). <em>Business Model Generation.</em> Wiley.</li>
+        <li>Lewandowski, M. (2016). Designing the Business Models for Circular Economy — Towards the Conceptual Framework. <em>Sustainability,</em> 8(1), 43.</li>
+        <li>McDonough, W. & Braungart, M. (2002). <em>Cradle to Cradle: Remaking the Way We Make Things.</em> North Point Press.</li>
+        <li>European Commission (2020). <em>Circular Economy Action Plan — For a Cleaner and More Competitive Europe.</em> EU Green Deal.</li>
+        <li>Circle Economy Foundation (2022). <em>Circulytics Tool Documentation.</em> circulytics.com</li>
+        <li>European Parliament (2024). <em>Right to Repair Directive (EU) 2024/1799.</em></li>
+        <li>Accenture (2014). <em>Circular Advantage: Innovative Business Models and Technologies to Create Value in a World Without Limits to Growth.</em></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h2>Ready to assess your business model?</h2>
+    <p>Use the analyzer to generate your circularity score, radar chart, and strategic recommendations — in under 15 minutes.</p>
+    <a href="index.html" class="cta-btn">Launch the Analyzer →</a>
+  </div>
+
+</main>
+
+<footer>
+  Circular Economy Business Model Analyzer · Methodology v1.0 · Built on the ReSOLVE Framework © Ellen MacArthur Foundation
+</footer>
+
+</body>
+</html>
